@@ -29,4 +29,5 @@ local function loadGameScript()
 end
 
 -- Execute the loadstring for the current game
+
 loadGameScript()
