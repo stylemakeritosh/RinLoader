@@ -1,33 +1,451 @@
 -- Services
 local HttpService = game:GetService("HttpService")
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+local TweenService = game:GetService("TweenService")
+local LocalPlayer = Players.LocalPlayer
+local player = LocalPlayer
 local gameId = game.PlaceId
 
--- Table to store game IDs and their corresponding loadstring URLs
-local gameLoadstrings = {
-    -- Format: [gameId] = "loadstring_url"
-    [10449761463] = "https://raw.githubusercontent.com/stylemakeritosh/Otherscriptsrc/refs/heads/main/camlocktsbsrcc",
-    [137925884276740] = "https://raw.githubusercontent.com/stylemakeritosh/Otherscriptsrc/refs/heads/main/Buildaplaneinfmoneysrc"
+-- Configuration table for game IDs, loadstring URLs, keys, and filenames
+local gameConfig = {
+    [10449761463] = {
+        loadstringUrl = "https://raw.githubusercontent.com/stylemakeritosh/Otherscriptsrc/refs/heads/main/camlocktsbsrcc",
+        correctKey = "CAMLOCKRIN",
+        fileName = "Camlockklaws.txt"
+    },
+    [137925884276740] = {
+        loadstringUrl = "https://raw.githubusercontent.com/stylemakeritosh/Otherscriptsrc/refs/heads/main/Buildaplaneinfmoneysrc",
+        correctKey = "INFMONEY",
+        fileName = "BuildaplaneKeyinf.txt"
+    },
+    [189707] = {
+        loadstringUrl = "https://raw.githubusercontent.com/stylemakeritosh/Otherscriptsrc/refs/heads/main/naturaldisastersrc",
+        correctKey = "DISASTERR",
+        fileName = "disasterssssss.txt"
+    }
 }
 
--- Function to load and execute the loadstring for the current game
-local function loadGameScript()
-    local loadstringUrl = gameLoadstrings[gameId]
-    
-    if loadstringUrl then
-        pcall(function()
-            local loadstringCode = game:HttpGet(loadstringUrl)
-            local success, result = pcall(function()
-                return loadstring(loadstringCode)()
-            end)
-            if not success then
-                warn("Failed to execute loadstring for Game ID " .. gameId .. ": " .. tostring(result))
-            end
-        end)
-    else
-        warn("No loadstring found for Game ID: " .. gameId)
+-- File Operations
+local function saveKey(fileName, key)
+    writefile(fileName, key)
+end
+
+local function loadKey(fileName)
+    if isfile(fileName) then
+        return readfile(fileName)
+    end
+    return nil
+end
+
+local function deleteKeyFile(fileName)
+    if isfile(fileName) then
+        delfile(fileName)
     end
 end
 
--- Execute the loadstring for the current game
+-- Enhanced Loading GUI
+local loadingGui = Instance.new("ScreenGui")
+loadingGui.Name = "LoadingGui"
+loadingGui.Parent = player.PlayerGui
+loadingGui.Enabled = false
 
+local loadingFrame = Instance.new("Frame")
+loadingFrame.Size = UDim2.new(0, 200, 0, 200)
+loadingFrame.Position = UDim2.new(0.5, -100, 0.5, -100)
+loadingFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+loadingFrame.BackgroundTransparency = 0.2
+loadingFrame.Parent = loadingGui
+
+local loadingCorner = Instance.new("UICorner")
+loadingCorner.CornerRadius = UDim.new(0, 15)
+loadingCorner.Parent = loadingFrame
+
+local spinnerOuter = Instance.new("Frame")
+spinnerOuter.Size = UDim2.new(0, 80, 0, 80)
+spinnerOuter.Position = UDim2.new(0.5, -40, 0.5, -60)
+spinnerOuter.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+spinnerOuter.Parent = loadingFrame
+local spinnerOuterCorner = Instance.new("UICorner")
+spinnerOuterCorner.CornerRadius = UDim.new(1, 0)
+spinnerOuterCorner.Parent = spinnerOuter
+
+local spinnerInner = Instance.new("Frame")
+spinnerInner.Size = UDim2.new(0, 40, 0, 40)
+spinnerInner.Position = UDim2.new(0.5, -20, 0.5, -20)
+spinnerInner.BackgroundColor3 = Color3.fromRGB(255, 255, 0)
+spinnerInner.Parent = spinnerOuter
+local spinnerInnerCorner = Instance.new("UICorner")
+spinnerInnerCorner.CornerRadius = UDim.new(1, 0)
+spinnerInnerCorner.Parent = spinnerInner
+
+local loadingText = Instance.new("TextLabel")
+loadingText.Size = UDim2.new(1, 0, 0, 30)
+loadingText.Position = UDim2.new(0, 0, 1, -40)
+loadingText.Text = "Loading..."
+loadingText.TextColor3 = Color3.fromRGB(255, 0, 0)
+loadingText.BackgroundTransparency = 1
+loadingText.Font = Enum.Font.GothamBold
+loadingText.TextSize = 24
+loadingText.Parent = loadingFrame
+
+local tweenOuter = TweenService:Create(spinnerOuter, TweenInfo.new(1.5, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut, -1), {Rotation = 360})
+local tweenInner = TweenService:Create(spinnerInner, TweenInfo.new(1, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut, -1), {Rotation = -360})
+
+local function animateLoadingText()
+    local dots = 0
+    while loadingGui.Enabled do
+        loadingText.Text = "Loading" .. string.rep(".", dots)
+        dots = (dots + 1) % 4
+        task.wait(0.5)
+    end
+end
+
+-- Enhanced Key System UI
+local screenGui = Instance.new("ScreenGui")
+screenGui.Parent = player.PlayerGui
+screenGui.IgnoreGuiInset = true
+
+local frame = Instance.new("Frame")
+frame.Size = UDim2.new(0, 300, 0, 230)
+frame.Position = UDim2.new(0.5, -150, 0.5, -115)
+frame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+frame.BackgroundTransparency = 0.05
+frame.BorderSizePixel = 0
+frame.Parent = screenGui
+
+local frameGradient = Instance.new("UIGradient")
+frameGradient.Color = ColorSequence.new{ColorSequenceKeypoint.new(0, Color3.fromRGB(20, 20, 20)), ColorSequenceKeypoint.new(1, Color3.fromRGB(50, 50, 50))}
+frameGradient.Rotation = 45
+frameGradient.Parent = frame
+
+local frameCorner = Instance.new("UICorner")
+frameCorner.CornerRadius = UDim.new(0, 15)
+frameCorner.Parent = frame
+
+local frameStroke = Instance.new("UIStroke")
+frameStroke.Thickness = 2
+frameStroke.Color = Color3.fromRGB(255, 0, 0)
+frameStroke.Transparency = 0.3
+frameStroke.Parent = frame
+
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1, 0, 0, 30)
+title.Position = UDim2.new(0, 0, 0, 40)
+title.Text = "Rin System"
+title.TextColor3 = Color3.fromRGB(255, 0, 0)
+title.BackgroundTransparency = 1
+title.Font = Enum.Font.GothamBlack
+title.TextSize = 24
+title.TextStrokeTransparency = 0.7
+title.Parent = frame
+
+local instruction = Instance.new("TextLabel")
+instruction.Size = UDim2.new(1, 0, 0, 20)
+instruction.Position = UDim2.new(0, 0, 0, 70)
+instruction.Text = "Enter the key to unlock script"
+instruction.TextColor3 = Color3.fromRGB(255, 0, 0)
+instruction.BackgroundTransparency = 1
+instruction.Font = Enum.Font.Gotham
+instruction.TextSize = 14
+instruction.Parent = frame
+
+local keyInput = Instance.new("TextBox")
+keyInput.Size = UDim2.new(0.85, 0, 0, 40)
+keyInput.Position = UDim2.new(0.075, 0, 0, 110)
+keyInput.PlaceholderText = "Enter Key Here"
+keyInput.TextColor3 = Color3.fromRGB(255, 255, 255)
+keyInput.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+keyInput.Font = Enum.Font.GothamSemibold
+keyInput.TextSize = 16
+keyInput.Parent = frame
+
+local keyInputCorner = Instance.new("UICorner")
+keyInputCorner.CornerRadius = UDim.new(0, 10)
+keyInputCorner.Parent = keyInput
+
+local keyInputStroke = Instance.new("UIStroke")
+keyInputStroke.Thickness = 1
+keyInputStroke.Color = Color3.fromRGB(255, 0, 0)
+keyInputStroke.Parent = keyInput
+
+local errorMessage = Instance.new("TextLabel")
+errorMessage.Size = UDim2.new(0.85, 0, 0, 20)
+errorMessage.Position = UDim2.new(0.075, 0, 0, 150)
+errorMessage.Text = ""
+errorMessage.TextColor3 = Color3.fromRGB(255, 0, 0)
+errorMessage.BackgroundTransparency = 1
+errorMessage.Font = Enum.Font.Gotham
+errorMessage.TextSize = 12
+errorMessage.Parent = frame
+errorMessage.Visible = false
+
+local checkKeyButton = Instance.new("TextButton")
+checkKeyButton.Size = UDim2.new(0.4, 0, 0, 30)
+checkKeyButton.Position = UDim2.new(0.075, 0, 0, 180)
+checkKeyButton.Text = "Verify Key"
+checkKeyButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+checkKeyButton.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+checkKeyButton.Font = Enum.Font.GothamBold
+checkKeyButton.TextSize = 14
+checkKeyButton.Parent = frame
+
+local checkKeyCorner = Instance.new("UICorner")
+checkKeyCorner.CornerRadius = UDim.new(0, 8)
+checkKeyCorner.Parent = checkKeyButton
+
+local getKeyButton = Instance.new("TextButton")
+getKeyButton.Size = UDim2.new(0.4, 0, 0, 30)
+getKeyButton.Position = UDim2.new(0.525, 0, 0, 180)
+getKeyButton.Text = "Get Key"
+getKeyButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+getKeyButton.BackgroundColor3 = Color3.fromRGB(128, 0, 128)
+getKeyButton.Font = Enum.Font.GothamBold
+getKeyButton.TextSize = 14
+getKeyButton.Parent = frame
+
+local getKeyCorner = Instance.new("UICorner")
+getKeyCorner.CornerRadius = UDim.new(0, 8)
+getKeyCorner.Parent = getKeyButton
+
+local supportButton = Instance.new("TextButton")
+supportButton.Size = UDim2.new(0, 120, 0, 30)
+supportButton.Position = UDim2.new(0.5, -60, 0, 5)
+supportButton.Text = "Need Support?"
+supportButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+supportButton.BackgroundColor3 = Color3.fromRGB(0, 0, 255)
+supportButton.Font = Enum.Font.GothamBold
+supportButton.TextSize = 14
+supportButton.Parent = frame
+
+local supportCorner = Instance.new("UICorner")
+supportCorner.CornerRadius = UDim.new(0, 5)
+supportCorner.Parent = supportButton
+
+local supportGlow = Instance.new("UIStroke")
+supportGlow.Thickness = 2
+supportGlow.Color = Color3.fromRGB(255, 0, 0)
+supportGlow.Transparency = 0.5
+supportGlow.Parent = supportButton
+
+local closeButton = Instance.new("TextButton")
+closeButton.Size = UDim2.new(0, 35, 0, 35)
+closeButton.Position = UDim2.new(1, -45, 0, 10)
+closeButton.Text = "X"
+closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+closeButton.BackgroundColor3 = Color3.fromRGB(255, 50, 50)
+closeButton.Font = Enum.Font.GothamBold
+closeButton.TextSize = 18
+closeButton.Parent = frame
+
+local closeCorner = Instance.new("UICorner")
+closeCorner.CornerRadius = UDim.new(0, 10)
+closeCorner.Parent = closeButton
+
+-- Draggable Function
+local function makeDraggable(element)
+    local dragging, dragInput, dragStart, startPos
+    local function update(input)
+        local delta = input.Position - dragStart
+        local newPos = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+        local tweenInfo = TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+        TweenService:Create(element, tweenInfo, {Position = newPos}):Play()
+    end
+    element.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            dragging = true
+            dragStart = input.Position
+            startPos = element.Position
+            input.Changed:Connect(function()
+                if input.UserInputState == Enum.UserInputState.End then dragging = false end
+            end)
+        end
+    end)
+    element.InputChanged:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+            dragInput = input
+        end
+    end)
+    UserInputService.InputChanged:Connect(function(input)
+        if input == dragInput and dragging then update(input) end
+    end)
+end
+
+-- Hover Effect Function
+local function createHoverEffect(button)
+    local originalSize = button.Size
+    local originalColor = button.BackgroundColor3
+    button.MouseEnter:Connect(function()
+        TweenService:Create(button, TweenInfo.new(0.2), {
+            BackgroundColor3 = Color3.fromRGB(255, 255, 0),
+            Size = originalSize + UDim2.new(0, 10, 0, 10)
+        }):Play()
+    end)
+    button.MouseLeave:Connect(function()
+        TweenService:Create(button, TweenInfo.new(0.2), {
+            BackgroundColor3 = originalColor,
+            Size = originalSize
+        }):Play()
+    end)
+end
+
+-- Color Changing Loop
+local colorElements = {
+    {element = title, property = "TextColor3"},
+    {element = instruction, property = "TextColor3"},
+    {element = errorMessage, property = "TextColor3"},
+    {element = frameStroke, property = "Color"},
+    {element = keyInputStroke, property = "Color"},
+    {element = checkKeyButton, property = "BackgroundColor3"},
+    {element = getKeyButton, property = "BackgroundColor3"},
+    {element = supportButton, property = "BackgroundColor3"},
+    {element = closeButton, property = "BackgroundColor3"},
+    {element = supportGlow, property = "Color"},
+}
+
+task.spawn(function()
+    while screenGui.Parent do
+        local newColor = Color3.fromHSV(math.random(), math.random(), math.random())
+        local tweenInfo = TweenInfo.new(1, Enum.EasingStyle.Linear)
+        for _, elem in ipairs(colorElements) do
+            if elem.element and elem.element.Parent then
+                TweenService:Create(elem.element, tweenInfo, {[elem.property] = newColor}):Play()
+            end
+        end
+        task.wait(5)
+    end
+end)
+
+-- Apply Effects
+makeDraggable(frame)
+createHoverEffect(checkKeyButton)
+createHoverEffect(getKeyButton)
+createHoverEffect(closeButton)
+
+supportButton.MouseEnter:Connect(function()
+    TweenService:Create(supportButton, TweenInfo.new(0.2), {
+        BackgroundColor3 = Color3.fromRGB(255, 255, 0),
+        Size = UDim2.new(0, 130, 0, 35)
+    }):Play()
+    TweenService:Create(supportGlow, TweenInfo.new(0.2), {Transparency = 0}):Play()
+end)
+supportButton.MouseLeave:Connect(function()
+    TweenService:Create(supportButton, TweenInfo.new(0.2), {
+        Size = UDim2.new(0, 120, 0, 30)
+    }):Play()
+    TweenService:Create(supportGlow, TweenInfo.new(0.2), {Transparency = 0.5}):Play()
+end)
+
+-- Function to load and execute the loadstring for the current game
+local function loadGameScript()
+    local config = gameConfig[gameId]
+    
+    if not config then
+        warn("No configuration found for Game ID: " .. gameId)
+        game.StarterGui:SetCore("SendNotification", {
+            Title = "Error",
+            Text = "No script available for this game!",
+            Duration = 5
+        })
+        return
+    end
+
+    local correctKey = config.correctKey
+    local loadstringUrl = config.loadstringUrl
+    local fileName = config.fileName
+    local keyVerified = false
+
+    -- Load saved key if exists
+    keyInput.Text = loadKey(fileName) or ""
+
+    -- Button Connections
+    checkKeyButton.MouseButton1Click:Connect(function()
+        if keyInput.Text == correctKey then
+            saveKey(fileName, keyInput.Text)
+            keyVerified = true
+            loadingGui.Enabled = true
+            tweenOuter:Play()
+            tweenInner:Play()
+            task.spawn(animateLoadingText)
+            task.delay(4, function()
+                loadingGui:Destroy()
+                pcall(function()
+                    local loadstringCode = game:HttpGet(loadstringUrl)
+                    local success, result = pcall(function()
+                        return loadstring(loadstringCode)()
+                    end)
+                    if not success then
+                        warn("Failed to execute loadstring for Game ID " .. gameId .. ": " .. tostring(result))
+                        game.StarterGui:SetCore("SendNotification", {
+                            Title = "Error",
+                            Text = "Failed to load script!",
+                            Duration = 5
+                        })
+                    end
+                end)
+            end)
+            local tweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.In)
+            local tween = TweenService:Create(frame, tweenInfo, {BackgroundTransparency = 1})
+            for _, child in ipairs(frame:GetChildren()) do
+                if child:IsA("GuiObject") then
+                    TweenService:Create(child, tweenInfo, {BackgroundTransparency = 1, TextTransparency = 1}):Play()
+                end
+            end
+            tween:Play()
+            tween.Completed:Connect(function()
+                screenGui:Destroy()
+            end)
+        else
+            errorMessage.Text = "Incorrect key. Please get the latest key."
+            errorMessage.Visible = true
+            task.delay(5, function()
+                errorMessage.Visible = false
+            end)
+            game.StarterGui:SetCore("SendNotification", {
+                Title = "Invalid Key",
+                Text = "Please enter the correct key!",
+                Duration = 3
+            })
+            local tweenInfo = TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut, 2, true)
+            TweenService:Create(frame, tweenInfo, {Position = frame.Position + UDim2.new(0, 10, 0, 0)}):Play()
+        end
+    end)
+
+    getKeyButton.MouseButton1Click:Connect(function()
+        setclipboard("https://discord.gg/H4emMMpF95")
+        game:GetService("StarterGui"):SetCore("SendNotification", {
+            Title = "Key Link",
+            Text = "Link for the key copied to clipboard!",
+            Button1 = "Thanks",
+            Button2 = "OK",
+            Duration = 5
+        })
+    end)
+
+    supportButton.MouseButton1Click:Connect(function()
+        setclipboard("https://discord.gg/H4emMMpF95")
+        game.StarterGui:SetCore("SendNotification", {
+            Title = "Support Link",
+            Text = "Discord support link copied!",
+            Duration = 3
+        })
+    end)
+
+    closeButton.MouseButton1Click:Connect(function()
+        local tweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.In)
+        local tween = TweenService:Create(frame, tweenInfo, {BackgroundTransparency = 1})
+        for _, child in ipairs(frame:GetChildren()) do
+            if child:IsA("GuiObject") then
+                TweenService:Create(child, tweenInfo, {BackgroundTransparency = 1, TextTransparency = 1}):Play()
+            end
+        end
+        tween:Play()
+        tween.Completed:Connect(function() screenGui:Destroy() end)
+    end)
+
+    -- Wait for key verification
+    while not keyVerified do task.wait() end
+end
+
+-- Execute the loadstring for the current game
 loadGameScript()
