@@ -23,6 +23,11 @@ local gameConfig = {
         loadstringUrl = "https://raw.githubusercontent.com/stylemakeritosh/Otherscriptsrc/refs/heads/main/naturaldisastersrc",
         correctKey = "DISASTERR",
         fileName = "disasterssssss.txt"
+    },
+    [126509999114328] = {
+        loadstringUrl = "https://raw.githubusercontent.com/stylemakeritosh/Otherscriptsrc/refs/heads/main/99nightslawhubsrc",
+        correctKey = "99NIGHTSRIN",
+        fileName = "99lawshubnights.txt"
     }
 }
 
