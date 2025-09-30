@@ -12,22 +12,27 @@ local gameConfig = {
     [10449761463] = {
         loadstringUrl = "https://raw.githubusercontent.com/stylemakeritosh/Otherscriptsrc/refs/heads/main/camlocktsbsrcc",
         correctKey = "CAMLOCKRIN",
-        fileName = "Camlockklaws.txt"
+        fileName = "Camlockrinny.txt"
     },
     [137925884276740] = {
         loadstringUrl = "https://raw.githubusercontent.com/stylemakeritosh/Otherscriptsrc/refs/heads/main/Buildaplaneinfmoneysrc",
         correctKey = "INFMONEY",
-        fileName = "BuildaplaneKeyinf.txt"
+        fileName = "BuildaplaneKeyinfrinny.txt"
     },
     [189707] = {
         loadstringUrl = "https://raw.githubusercontent.com/stylemakeritosh/Otherscriptsrc/refs/heads/main/naturaldisastersrc",
         correctKey = "DISASTERR",
-        fileName = "disasterssssss.txt"
+        fileName = "disastersssssss.txt"
     },
     [126509999114328] = {
         loadstringUrl = "https://raw.githubusercontent.com/stylemakeritosh/Otherscriptsrc/refs/heads/main/99nightslawhubsrc",
         correctKey = "99NIGHTSRIN",
-        fileName = "99lawshubnights.txt"
+        fileName = "99ooonights.txt"
+    }, 
+    [18571010582] = {
+        loadstringUrl = "https://raw.githubusercontent.com/stylemakeritosh/Rinnyhub/refs/heads/main/kaizenbattlegrounds",
+        correctKey = "NOCD67",
+        fileName = "kaiiiiiizen.txt"
     }
 }
 
@@ -417,7 +422,7 @@ local function loadGameScript()
     end)
 
     getKeyButton.MouseButton1Click:Connect(function()
-        setclipboard("https://discord.gg/H4emMMpF95")
+        setclipboard("https://discord.gg/aBYUqNDt7p")
         game:GetService("StarterGui"):SetCore("SendNotification", {
             Title = "Key Link",
             Text = "Link for the key copied to clipboard!",
@@ -428,7 +433,7 @@ local function loadGameScript()
     end)
 
     supportButton.MouseButton1Click:Connect(function()
-        setclipboard("https://discord.gg/H4emMMpF95")
+        setclipboard("https://discord.gg/aBYUqNDt7p")
         game.StarterGui:SetCore("SendNotification", {
             Title = "Support Link",
             Text = "Discord support link copied!",
