@@ -33,6 +33,11 @@ local gameConfig = {
         loadstringUrl = "https://raw.githubusercontent.com/stylemakeritosh/Rinnyhub/refs/heads/main/kaizenbattlegrounds",
         correctKey = "NOCD67",
         fileName = "kaiiiiiizen.txt"
+    },
+    [99567941238278] = {
+        loadstringUrl = "https://raw.githubusercontent.com/stylemakeritosh/Rinnyhub/refs/heads/main/inkgame",
+        correctKey = "BESTINKGAME67",
+        fileName = "inkgame67rin.txt"
     }
 }
 
