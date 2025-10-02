@@ -38,6 +38,11 @@ local gameConfig = {
         loadstringUrl = "https://raw.githubusercontent.com/stylemakeritosh/Rinnyhub/refs/heads/main/inkgame",
         correctKey = "BESTINKGAME67",
         fileName = "inkgame67rin.txt"
+    },
+    [142823291] = {
+        loadstringUrl = "https://raw.githubusercontent.com/stylemakeritosh/Rinnyhub/refs/heads/main/mm2rinnyhub",
+        correctKey = "R1NMM2",
+        fileName = "mm267rin.txt"
     }
 }
 
